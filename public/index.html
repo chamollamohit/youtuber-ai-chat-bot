@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Youtuber</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: #9ca3af;
+            border-radius: 4px;
+        }
+
+        .transition-all {
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Styling for code blocks */
+        pre {
+            background-color: #1f2937;
+            /* gray-800 */
+            color: #d1d5db;
+            /* gray-300 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            /* Adds horizontal scroll for long lines */
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans antialiased">
+
+    <div id="persona-selection"
+        class="container mx-auto max-w-4xl min-h-screen flex flex-col justify-center items-center p-4">
+        <header class="text-center mb-10">
+            <h1 class="text-5xl font-bold text-gray-800">Choose Your Mentor</h1>
+            <p class="text-gray-500 mt-2">Click on a youtuber/teacher to start the conversation.</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+            <div data-persona="hitesh"
+                class="persona-card bg-white p-6 rounded-lg shadow-lg cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2">
+                <img src="https://avatars.githubusercontent.com/u/11613311?v=4" alt="Hitesh Choudhary"
+                    class="w-28 h-28 rounded-full mx-auto mb-4 border-4 border-gray-200">
+                <h2 class="text-center text-2xl font-bold text-gray-900">Hitesh Choudhary</h2>
+                <p class="text-center text-gray-600 mt-2">The tech guru. Ask anything about code, chai, or building a
+                    career in tech.</p>
+            </div>
+
+            <div data-persona="piyush"
+                class="persona-card bg-white p-6 rounded-lg shadow-lg cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2">
+                <img src="https://avatars.githubusercontent.com/u/44976328?v=4" alt="Piyush Garg"
+                    class="w-28 h-28 rounded-full mx-auto mb-4 border-4 border-gray-200 object-cover">
+                <h2 class="text-center text-2xl font-bold text-gray-900">Piyush Garg</h2>
+                <p class="text-center text-gray-600 mt-2">The growth hacker. Let's talk about full-stack development,
+                    freelancing, and scaling your career.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat-container" class="hidden h-screen flex flex-col max-w-2xl mx-auto">
+        <header id="chat-header" class="flex items-center p-4 bg-white shadow-md">
+            <button id="back-button" class="p-2 rounded-full hover:bg-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <img id="chat-avatar" src="" alt="Persona Avatar" class="w-12 h-12 rounded-full ml-4 border-2">
+            <div class="ml-4">
+                <h2 id="chat-name" class="text-xl font-bold text-gray-800"></h2>
+                <p id="chat-status" class="text-sm text-green-500">Online</p>
+            </div>
+        </header>
+
+        <main class="chat-messages flex-grow p-4 overflow-y-auto bg-gray-50">
+        </main>
+
+        <footer class="p-4 bg-white border-t">
+            <form id="chat-form" class="flex items-center">
+                <input id="chat-input" type="text" placeholder="Type your message..."
+                    class="flex-grow border rounded-l-md p-3 focus:outline-none focus:ring-2">
+                <button type="submit" id="send-button"
+                    class="text-white px-6 py-3 rounded-r-md transition duration-200">
+                    Send
+                </button>
+            </form>
+        </footer>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const personaSelectionScreen = document.getElementById('persona-selection');
+            const chatContainer = document.getElementById('chat-container');
+            const personaCards = document.querySelectorAll('.persona-card');
+            const backButton = document.getElementById('back-button');
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const messagesContainer = document.querySelector('.chat-messages');
+
+            const personas = {
+                hitesh: {
+                    name: 'Hitesh Choudhary',
+                    avatar: 'https://avatars.githubusercontent.com/u/11613311?v=4',
+                    greeting: 'Haanji !! Aj kya krna hai phir meri chai ready hai or apki ??',
+                    themeColor: 'bg-blue-600',
+                    hoverColor: 'hover:bg-blue-700',
+                    ringColor: 'focus:ring-blue-500',
+                    botBubbleColor: 'bg-blue-100 text-blue-800'
+                },
+                piyush: {
+                    name: 'Piyush Garg',
+                    avatar: 'https://avatars.githubusercontent.com/u/44976328?v=4',
+                    greeting: 'Hey everyone! Let\'s build something cool today. Shoot your questions.',
+                    themeColor: 'bg-gray-800',
+                    hoverColor: 'hover:bg-gray-900',
+                    ringColor: 'focus:ring-gray-800',
+                    botBubbleColor: 'bg-gray-200 text-gray-800'
+                }
+            };
+
+            let currentPersona = null;
+            let chatHistory = [];
+
+            personaCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const personaId = card.getAttribute('data-persona');
+                    currentPersona = personas[personaId];
+                    setupChatInterface(currentPersona);
+                    personaSelectionScreen.classList.add('hidden');
+                    chatContainer.classList.remove('hidden');
+                });
+            });
+
+            backButton.addEventListener('click', () => {
+                chatContainer.classList.add('hidden');
+                personaSelectionScreen.classList.remove('hidden');
+                messagesContainer.innerHTML = '';
+                currentPersona = null;
+                chatHistory = [];
+            });
+
+            chatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleUserMessage();
+            });
+
+            function setupChatInterface(persona) {
+                document.getElementById('chat-avatar').src = persona.avatar;
+                document.getElementById('chat-name').textContent = persona.name;
+                const sendButton = document.getElementById('send-button');
+                sendButton.className = `text-white px-6 py-3 rounded-r-md transition duration-200 ${persona.themeColor} ${persona.hoverColor}`;
+                chatInput.className = `flex-grow border rounded-l-md p-3 focus:outline-none focus:ring-2 ${persona.ringColor}`;
+                appendMessage(persona.greeting, 'bot');
+            }
+
+            async function handleUserMessage() {
+                const userInput = chatInput.value.trim();
+                if (userInput === '') return;
+                chatHistory.push({ role: 'user', content: userInput });
+                appendMessage(userInput, 'user');
+                chatInput.value = '';
+                const typingIndicator = addTypingIndicator();
+                try {
+                    const botResponse = await getAiResponse(chatHistory, currentPersona.name);
+                    chatHistory.push({ role: 'assistant', content: botResponse });
+                    typingIndicator.remove();
+                    appendMessage(botResponse, 'bot');
+                } catch (error) {
+                    chatHistory.pop();
+                    typingIndicator.remove();
+                    appendMessage('Sorry, something went wrong on my end.', 'bot');
+                    console.error('Error fetching response:', error);
+                }
+            }
+
+            function escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            function formatCodeResponse(text) {
+                const codeBlockRegex = /```(\w*)\n([\s\S]*?)\n```/g;
+                return text.replace(codeBlockRegex, (match, lang, code) => {
+                    const escapedCode = escapeHtml(code);
+                    return `<pre><code class="language-${lang}">${escapedCode}</code></pre>`;
+                }).replace(/\n/g, '<br>');
+            }
+
+            function appendMessage(text, sender) {
+                const messageWrapper = document.createElement('div');
+                const messageBubble = document.createElement('div');
+                messageWrapper.classList.add('flex', 'mb-4');
+                messageBubble.classList.add('rounded-lg', 'py-2', 'px-4', 'max-w-md', 'shadow');
+                if (sender === 'user') {
+                    messageWrapper.classList.add('justify-end');
+                    messageBubble.classList.add('bg-indigo-500', 'text-white');
+                    messageBubble.textContent = text;
+                } else {
+                    messageWrapper.classList.add('justify-start');
+                    messageBubble.classList.add(...currentPersona.botBubbleColor.split(' '));
+                    messageBubble.innerHTML = formatCodeResponse(text);
+                    if (chatHistory.length === 0) {
+                        chatHistory.push({ role: 'assistant', content: text });
+                    }
+                }
+                messageWrapper.appendChild(messageBubble);
+                messagesContainer.appendChild(messageWrapper);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            function addTypingIndicator() {
+                const indicatorWrapper = document.createElement('div');
+                indicatorWrapper.classList.add('flex', 'justify-start', 'mb-4', 'typing-indicator');
+                const indicatorBubble = document.createElement('div');
+                indicatorBubble.classList.add(...currentPersona.botBubbleColor.split(' '), 'rounded-lg', 'py-3', 'px-4', 'shadow');
+                indicatorBubble.innerHTML = `<div class="flex items-center space-x-1"><span class="h-2 w-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span><span class="h-2 w-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span><span class="h-2 w-2 bg-gray-400 rounded-full animate-bounce"></span></div>`;
+                indicatorWrapper.appendChild(indicatorBubble);
+                messagesContainer.appendChild(indicatorWrapper);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                return indicatorWrapper;
+            }
+
+            async function getAiResponse(history, personaName) {
+                const backendUrl = '/api/chat';
+                try {
+                    const response = await fetch(backendUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ history: history, persona: personaName }),
+                    });
+                    if (!response.ok) { throw new Error(`Server error: ${response.status}`); }
+                    const data = await response.json();
+                    return data.reply;
+                } catch (error) {
+                    console.error("Failed to fetch from backend:", error);
+                    throw error;
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
