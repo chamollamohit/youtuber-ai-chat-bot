@@ -6,7 +6,7 @@ A web application that lets you chat with AI personas of famous tech educators a
 
 ## Live Demo
 
-You can view the live project here: [https://youtuber-ai-chat-bot.vercel.app/](https://youuber-ai-chat-bot.vercel.app/)
+You can view the live project here: [https://youuber-ai-chat-bot.vercel.app/](https://youuber-ai-chat-bot.vercel.app/)
 
 ***
 
