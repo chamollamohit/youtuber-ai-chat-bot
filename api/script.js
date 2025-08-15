@@ -1,21 +1,21 @@
-// 1. Import necessary packages using ES Module syntax
+
 import express from 'express';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
-// 2. Configure the environment and server
-dotenv.config();
+// Configure the environment and server
+dotenv.config('./env');
 const app = express()
 
-// 3. Apply middleware
+// CORS for security
 app.use(cors({
     origin: process.env.CORS_ORIGIN
 }));
 app.use(express.json());
 app.use(express.static('public')) //Uncoment if using on local machine
 
-// 4. Initialize the OpenAI-compatible client
+// Error Handling if API Key & Base url is not there
 if (!process.env.OPENAI_API_KEY || !process.env.OPENAI_BASE_URL) {
     throw new Error('OPENAI_API_KEY and OPENAI_BASE_URL are not set in the .env file');
 }
@@ -25,7 +25,7 @@ const openai = new OpenAI({
     baseURL: process.env.OPENAI_BASE_URL,
 });
 
-// 5. Define the chat API endpoint
+// API Endpoint
 app.post('/api/chat', async (req, res) => {
     try {
         const { history, persona } = req.body;
@@ -34,7 +34,7 @@ app.post('/api/chat', async (req, res) => {
             return res.status(400).json({ error: 'Message and persona are required.' });
         }
 
-        // --- Create a system prompt to define the AI's persona ---
+        
         let systemPrompt;
         if (persona === 'Hitesh Choudhary') {
             systemPrompt = `1. Primary Information
@@ -91,9 +91,9 @@ app.post('/api/chat', async (req, res) => {
             ...history
         ]
         const completion = await openai.chat.completions.create({
-            // The user message and system prompt are passed in an array
+
             messages: messages,
-            // Replace this with the actual model name your service uses
+
             model: 'gemini-2.5-flash-lite',
         });
 
@@ -106,7 +106,7 @@ app.post('/api/chat', async (req, res) => {
         res.status(500).json({ error: 'Failed to get response from AI.' });
     }
 });
-// 6. Final logic to run server
+
 
 // It runs the server only if not in a Vercel serverless environment.
 if (process.env.VERCEL !== '1') {
@@ -116,6 +116,6 @@ if (process.env.VERCEL !== '1') {
     });
 }
 
-// 7. Export the app for Vercel
+
 export default app;
 
