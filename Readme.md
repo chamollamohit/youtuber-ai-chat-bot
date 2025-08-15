@@ -66,6 +66,10 @@ You need to have Node.js and npm installed on your machine.
     # The base URL for the API endpoint
     OPENAI_BASE_URL="the_api_base_url"
     ```
+5.  **Start Server:**
+    ```sh
+    npm run dev
+    ```
 
 ***
 
